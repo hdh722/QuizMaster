@@ -7,6 +7,7 @@ public class Timer : MonoBehaviour
     float time = 0;
     [HideInInspector] public bool isProblemTime = true;
     [HideInInspector] public float fillAmount;
+    [HideInInspector] public bool loadNextQuestion;
 
     void Start()
     {
@@ -19,17 +20,9 @@ public class Timer : MonoBehaviour
 
     }
 
-    private void UpdateFillAmount()
-    {
-        if (isProblemTime)
-            fillAmount = time / problemTime;
-        else
-            fillAmount = time / solutionTime;
-    }
-
     private void TimerCountDown()
     {
-        Debug.Log("남은시간: " + time);
+        //Debug.Log("남은시간: " + time);
         time -= Time.deltaTime;
         if (time <= 0)
         {
@@ -42,7 +35,19 @@ public class Timer : MonoBehaviour
             {
                 isProblemTime = true;
                 time = problemTime;
+                loadNextQuestion = true;
             }
         }
+    }
+    private void UpdateFillAmount()
+    {
+        if (isProblemTime)
+            fillAmount = time / problemTime;
+        else
+            fillAmount = time / solutionTime;
+    }
+    public void CancelTimer()
+    {
+        time = 0;
     }
 }

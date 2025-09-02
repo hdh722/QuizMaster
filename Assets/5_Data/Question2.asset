@@ -9,13 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23409485cc504154cb878ba922a87e52, type: 3}
+  m_Script: {fileID: 11500000, guid: 45a73edc76056f145a167d818e817005, type: 3}
   m_Name: Question2
   m_EditorClassIdentifier: 
-  question: "\uC9C8\uBB382\n\n2\n3\n4\n5\n6"
+  question: "\uC9C0\uAE08 \uB098\uB294"
   answers:
-  - 
-  - 
-  - 
-  - 
-  correctAnswerIndex: 0
+  - "\uC9D1\uC5D0 \uAC00\uACE0 \uC2F6\uB2E4"
+  - "\uB215\uACE0 \uC2F6\uB2E4"
+  - "\uBC30\uACE0\uD504\uB2E4"
+  - "\uC544\uBB34\uC0DD\uAC01\uC774 \uC5C6\uB2E4"
+  correctAnswerIndex: 3
