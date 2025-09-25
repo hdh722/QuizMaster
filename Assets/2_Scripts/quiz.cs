@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -8,6 +9,7 @@ public class quiz : MonoBehaviour
 {
     [Header("질문")]
     [SerializeField] TextMeshProUGUI questionText;
+    [SerializeField] TextMeshProUGUI hintText;
     [SerializeField] List<QuestionSO> questions = new List<QuestionSO>();
     QuestionSO currentQuestion;
 
@@ -29,11 +31,79 @@ public class quiz : MonoBehaviour
     [SerializeField] TextMeshProUGUI scoreText;
     ScoreKeeper scoreKeeper;
 
+    [Header("Progressbar")]
+    [SerializeField] Slider progressBar;
+    //public bool isComplete;
+
+    [Header("ChatGPT clietnt")]
+    [SerializeField] ChatGPTClient chatGPTClient;
+    [SerializeField] int questionCount = 3;
+    [SerializeField] TextMeshProUGUI LoadingText;
+
+    bool isGeneratingQuestions = false;
+
+
     void Start()
     {
         timer = FindFirstObjectByType<Timer>();
         scoreKeeper = FindFirstObjectByType<ScoreKeeper>();
+        chatGPTClient.quizGenerateHandler += QuizGeneratedHandler;
+
+        if (questions.Count ==0)
+        {
+            GenerateQuestionsIfNeeded();
+        }
+        else
+        {
+            InitailizeProgressBar();
+        }
+        
+        //GetNextQuestion();
+    }
+
+    private void GenerateQuestionsIfNeeded()
+    {
+        if (isGeneratingQuestions) return;
+
+        isGeneratingQuestions = true;
+        GameManager.Instance.ShowLoadingScreen();
+        string topicToUse = GetTrandTopic();
+        chatGPTClient.GenerateQuizQuestions(questionCount, topicToUse);
+        Debug.Log($"GenerateQuestionsIfneeded {topicToUse}");
+    }
+
+    private string GetTrandTopic()
+    {
+        string[] topics = new string[] { "예술", "음악", "스포츠", "동물", "문화" };
+        int randomIndex = UnityEngine.Random. Range(0, topics.Length);
+        return topics[randomIndex];
+    }
+
+    void QuizGeneratedHandler(List<QuestionSO> GeneratedQuestions)
+    {
+        Debug.Log($"QuizGeneratedHandler {GeneratedQuestions.Count}");
+        isGeneratingQuestions = false;
+
+        if(GeneratedQuestions == null || GeneratedQuestions.Count ==0)
+        {
+            Debug.LogError("질문생성실패");
+            LoadingText.text = "문제 생성에 실패했습니다.";
+            return;
+        }
+
+        Debug.Log("질문생성완료 ===> " + GeneratedQuestions[0].GetQuestion());
+        questions.AddRange(GeneratedQuestions);
+        progressBar.maxValue = GeneratedQuestions.Count;
+
         GetNextQuestion();
+
+    }
+
+
+    private void InitailizeProgressBar()
+    {
+        progressBar.maxValue = questions.Count;
+        progressBar.value = 0;
     }
 
     private void Update()
@@ -47,8 +117,16 @@ public class quiz : MonoBehaviour
 
         if (timer.loadNextQuestion)
         {
-            timer.loadNextQuestion = false;
-            GetNextQuestion();
+            if (questions.Count == 0)
+            {
+                GenerateQuestionsIfNeeded();
+                //GameManager.Instance.ShowEndScene();
+            }
+            else
+            {
+                //timer.loadNextQuestion = false;
+                GetNextQuestion();
+            }
         }
 
         if (timer.isProblemTime ==false && chooseAnswer == false)
@@ -64,13 +142,17 @@ public class quiz : MonoBehaviour
             Debug.Log("남은문제없음");
             return;
         }
+
+        timer.loadNextQuestion = false;
+
+        GameManager.Instance.ShowQuizScene();
         chooseAnswer = false;
         SetButtonState(true);
         SetDefaultButtonSprite();
         GetRandomQuestion();
         OnDisplayQuestion();
         scoreKeeper.IncrementQuestionSeen();
-
+        progressBar.value++;
     }
 
     private void GetRandomQuestion()
@@ -97,6 +179,11 @@ public class quiz : MonoBehaviour
         Displaysolution(index);
         timer.CancelTimer();
         scoreText.text = $"Score : {scoreKeeper.CalculateScore()}%";
+
+        //if (progressBar.value == progressBar.maxValue)
+        //{
+        //    isComplete = true;
+        //}
     }
 
     private void Displaysolution(int index)
