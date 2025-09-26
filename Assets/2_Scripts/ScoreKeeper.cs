@@ -4,6 +4,7 @@ public class ScoreKeeper : MonoBehaviour
 {
     int correctAnswers = 0;
     int questionSeen = 0;
+    int totalScore = 0; // 실제 점수
 
     public int GetcorrectAnswers() 
     { 
@@ -25,8 +26,14 @@ public class ScoreKeeper : MonoBehaviour
         questionSeen++;
     }
 
+    public void AddScore(int value)
+    {
+        totalScore += value;
+    }
+
     public int CalculateScore()
     {
-        return Mathf .RoundToInt((float)correctAnswers / questionSeen * 100);
+        // 실제 점수 반환
+        return totalScore;
     }
 }

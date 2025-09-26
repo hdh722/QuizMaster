@@ -45,6 +45,7 @@ public class QuizQuestion
     public string question;
     public string[] answers;
     public int correctAnswerIndex;
+    public string hint; // 힌트 필드 추가
 }
 
 public class ChatGPTClient : MonoBehaviour
@@ -55,7 +56,7 @@ public class ChatGPTClient : MonoBehaviour
     public delegate void QuizGenerateHandler(List<QuestionSO> questions);
     public event QuizGenerateHandler quizGenerateHandler;
 
-    public void GenerateQuizQuestions(int count = 3, string topic = "일반상식")
+    public void GenerateQuizQuestions(int count = 5, string topic = "일반상식")
     {
         StartCoroutine(RequestQuizQuestions(count, topic));
     }
@@ -72,7 +73,7 @@ public class ChatGPTClient : MonoBehaviour
                        "- 선택지는 함정이 있거나 재치있게 구성해주세요\n" +
                        "- 정답은 0~3 사이의 인덱스로 표시해주세요\n" +
                        "- 문제와 선택지는 흥미롭고 참여하고 싶게 만들어주세요\n" +
-                       "- 각 문제 대한 힌트도 작성해주세요\n" +
+                       "- 각 문제에 대한 힌트도 작성해주세요\n" +
                        "- 가능하면 실생활과 연관된 예시나 시나리오를 활용해주세요\n" +
                        "- 응답은 반드시 다음 JSON 형식으로만 제공해주세요:\n" +
                        "{\n" +
@@ -182,10 +183,12 @@ public class ChatGPTClient : MonoBehaviour
             var questionField = typeof(QuestionSO).GetField("question", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             var answersField = typeof(QuestionSO).GetField("answers", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             var correctAnswerIndexField = typeof(QuestionSO).GetField("correctAnswerIndex", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var hintField = typeof(QuestionSO).GetField("hint", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
             questionField?.SetValue(questionSO, quizQ.question);
             answersField?.SetValue(questionSO, quizQ.answers);
             correctAnswerIndexField?.SetValue(questionSO, quizQ.correctAnswerIndex);
+            hintField?.SetValue(questionSO, quizQ.hint); // 힌트 연결
 
             questionSOs.Add(questionSO);
         }

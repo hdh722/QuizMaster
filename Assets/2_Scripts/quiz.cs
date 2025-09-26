@@ -39,6 +39,9 @@ public class quiz : MonoBehaviour
     [SerializeField] ChatGPTClient chatGPTClient;
     [SerializeField] int questionCount = 3;
     [SerializeField] TextMeshProUGUI LoadingText;
+    [SerializeField] TextMeshProUGUI HintText;
+
+    [SerializeField] GameObject HintPopup; // 인스펙터에서 드래그
 
     bool isGeneratingQuestions = false;
 
@@ -56,6 +59,13 @@ public class quiz : MonoBehaviour
         else
         {
             InitailizeProgressBar();
+        }
+
+        if (HintPopup != null)
+        {
+            var button = HintPopup.GetComponent<Button>();
+            if (button != null)
+                button.onClick.AddListener(OnHintPopupClicked);
         }
         
         //GetNextQuestion();
@@ -153,6 +163,10 @@ public class quiz : MonoBehaviour
         OnDisplayQuestion();
         scoreKeeper.IncrementQuestionSeen();
         progressBar.value++;
+
+        // 문제 시작 시 HintPopup 활성화
+        if (HintPopup != null)
+            HintPopup.SetActive(true);
     }
 
     private void GetRandomQuestion()
@@ -166,6 +180,7 @@ public class quiz : MonoBehaviour
     private void OnDisplayQuestion()
     {
         questionText.text = currentQuestion.GetQuestion();
+        hintText.text = currentQuestion.GetHint();
 
         for (int i = 0; i < answerButtons.Length; i++)
         {
@@ -178,7 +193,7 @@ public class quiz : MonoBehaviour
         chooseAnswer = true;
         Displaysolution(index);
         timer.CancelTimer();
-        scoreText.text = $"Score : {scoreKeeper.CalculateScore()}%";
+        scoreText.text = $"점수 : {scoreKeeper.CalculateScore()}점";
 
         //if (progressBar.value == progressBar.maxValue)
         //{
@@ -193,10 +208,29 @@ public class quiz : MonoBehaviour
             questionText.text = "정답입니다!";
             answerButtons[index].GetComponent<Image>().sprite = correctAnswerSprite;
             scoreKeeper.IncrementCorrectAnswer();
+
+            // 남은 시간에 따라 점수 차등 부여
+            int bonusScore = 1;
+            if (timer.isProblemTime && timer != null)
+            {
+                var timeField = typeof(Timer).GetField("time", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                float remainTime = timeField != null ? (float)timeField.GetValue(timer) : 0f;
+
+                if (remainTime >= 11f && remainTime <= 20f)
+                    bonusScore = 3;
+                else if (remainTime >= 5f && remainTime <= 10f)
+                    bonusScore = 2;
+                else if (remainTime >= 0f && remainTime < 5f)
+                    bonusScore = 1;
+            }
+
+            scoreKeeper.AddScore(bonusScore); // 실제 점수에 보너스 반영
+            scoreText.text = $"점수 : {scoreKeeper.CalculateScore()}점";
         }
         else
         {
             questionText.text = "틀렸습니다 " + currentQuestion.GetcorrectAnswer() + "이 정답입니다.";
+            scoreText.text = $"점수 : {scoreKeeper.CalculateScore()}점";
         }
 
         SetButtonState(false);
@@ -217,5 +251,11 @@ public class quiz : MonoBehaviour
             odj.GetComponent<Button>().interactable = state;
         }
         
+    }
+
+    public void OnHintPopupClicked()
+    {
+        if (HintPopup != null)
+            HintPopup.SetActive(false);
     }
 }

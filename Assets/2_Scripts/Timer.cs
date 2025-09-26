@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class Timer : MonoBehaviour
 {
@@ -12,12 +13,18 @@ public class Timer : MonoBehaviour
 
     public TextMeshProUGUI timerText; // 인스펙터에서 드래그
     public GameObject loadingCanvas;  // 인스펙터에서 드래그
+    public Image timerImage;          // 인스펙터에서 드래그
+
+    Color defaultColor = Color.white;
 
     void Start()
     {
         time = problemTime;
         loadNextQuestion = true;
         UpdateTimerText();
+
+        if (timerImage != null)
+            defaultColor = timerImage.color;
     }
     void Update()
     {
@@ -30,6 +37,7 @@ public class Timer : MonoBehaviour
         TimerCountDown();
         UpdateFillAmount();
         UpdateTimerText();
+        UpdateTimerImageColor();
     }
 
     private void TimerCountDown()
@@ -67,6 +75,23 @@ public class Timer : MonoBehaviour
         if (timerText != null)
         {
             timerText.text = Mathf.Ceil(time).ToString("0");
+        }
+    }
+
+    private void UpdateTimerImageColor()
+    {
+        if (timerImage != null && timerText != null)
+        {
+            if (isProblemTime && time <= 9f)
+            {
+                timerImage.color = Color.red;
+                timerText.color = Color.yellow;
+            }
+            else
+            {
+                timerImage.color = defaultColor;
+                timerText.color = Color.white;
+            }
         }
     }
 }
