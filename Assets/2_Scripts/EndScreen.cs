@@ -9,8 +9,7 @@ public class EndScreen : MonoBehaviour
 
     public void ShowFinalScore()
     {
-        finalScoreText.text = "ÃàÇÏÀÎÁö´Â ¸ğ¸£°ÚÁö¸¸\n\n" + $"´ç½ÅÀÇ Á¡¼ö´Â {scoreKeeper.CalculateScore()}% ÀÔ´Ï´Ù.";
+        Debug.Log($"EndScreenì—ì„œ ìµœì¢… ì ìˆ˜: {scoreKeeper.CalculateScore()}");
+        finalScoreText.text = "ì¶•í•˜í•©ë‹ˆë‹¤!\n\n" + $"ì´ ì ìˆ˜ëŠ” {scoreKeeper.CalculateScore()}ì  ì…ë‹ˆë‹¤.";
     }
-
-    
 }

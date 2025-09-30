@@ -7,27 +7,27 @@ using UnityEngine.UI;
 
 public class quiz : MonoBehaviour
 {
-    [Header("Áú¹®")]
+    [Header("ï¿½ï¿½ï¿½ï¿½")]
     [SerializeField] TextMeshProUGUI questionText;
     [SerializeField] TextMeshProUGUI hintText;
     [SerializeField] List<QuestionSO> questions = new List<QuestionSO>();
     QuestionSO currentQuestion;
 
-    [Header("º¸±â")]
+    [Header("ï¿½ï¿½ï¿½ï¿½")]
     [SerializeField] GameObject[] answerButtons;
     
-    [Header("¹öÆ° »ö")]
+    [Header("ï¿½ï¿½Æ° ï¿½ï¿½")]
     [SerializeField] Sprite defaultAnswerSprite;
     [SerializeField] Sprite correctAnswerSprite;
 
-    [Header("Å¸ÀÌ¸Ó")]
+    [Header("Å¸ï¿½Ì¸ï¿½")]
     [SerializeField] Image timerImage;
     [SerializeField] Sprite problemTimerSprite;
     [SerializeField] Sprite solutionTimerSprite;
     Timer timer;
     bool chooseAnswer = false;
 
-    [Header("Á¡¼ö")]
+    [Header("ï¿½ï¿½ï¿½ï¿½")]
     [SerializeField] TextMeshProUGUI scoreText;
     ScoreKeeper scoreKeeper;
 
@@ -37,11 +37,14 @@ public class quiz : MonoBehaviour
 
     [Header("ChatGPT clietnt")]
     [SerializeField] ChatGPTClient chatGPTClient;
-    [SerializeField] int questionCount = 3;
+    [SerializeField] int questionCount = 9;
     [SerializeField] TextMeshProUGUI LoadingText;
     [SerializeField] TextMeshProUGUI HintText;
 
-    [SerializeField] GameObject HintPopup; // ÀÎ½ºÆåÅÍ¿¡¼­ µå·¡±×
+    [SerializeField] GameObject HintPopup; // ï¿½Î½ï¿½ï¿½ï¿½ï¿½Í¿ï¿½ï¿½ï¿½ ï¿½å·¡ï¿½ï¿½
+    [SerializeField] Button TimePlus;      // ï¿½Î½ï¿½ï¿½ï¿½ï¿½Í¿ï¿½ï¿½ï¿½ ï¿½å·¡ï¿½ï¿½
+    [SerializeField] GameObject WinCanvas; // ï¿½Î½ï¿½ï¿½ï¿½ï¿½Í¿ï¿½ï¿½ï¿½ ï¿½å·¡ï¿½ï¿½
+    [SerializeField] GameObject QuizCanvas;
 
     bool isGeneratingQuestions = false;
 
@@ -84,7 +87,7 @@ public class quiz : MonoBehaviour
 
     private string GetTrandTopic()
     {
-        string[] topics = new string[] { "¿¹¼ú", "À½¾Ç", "½ºÆ÷Ã÷", "µ¿¹°", "¹®È­" };
+        string[] topics = new string[] { "ï¿½ï¿½ï¿½ï¿½", "ï¿½ï¿½ï¿½ï¿½", "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", "ï¿½ï¿½ï¿½ï¿½", "ï¿½ï¿½È­" };
         int randomIndex = UnityEngine.Random. Range(0, topics.Length);
         return topics[randomIndex];
     }
@@ -96,14 +99,14 @@ public class quiz : MonoBehaviour
 
         if(GeneratedQuestions == null || GeneratedQuestions.Count ==0)
         {
-            Debug.LogError("Áú¹®»ý¼º½ÇÆÐ");
-            LoadingText.text = "¹®Á¦ »ý¼º¿¡ ½ÇÆÐÇß½À´Ï´Ù.";
+            Debug.LogError("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
+            LoadingText.text = "ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ß½ï¿½ï¿½Ï´ï¿½.";
             return;
         }
 
-        Debug.Log("Áú¹®»ý¼º¿Ï·á ===> " + GeneratedQuestions[0].GetQuestion());
+        Debug.Log("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï·ï¿½ ===> " + GeneratedQuestions[0].GetQuestion());
         questions.AddRange(GeneratedQuestions);
-        progressBar.maxValue = GeneratedQuestions.Count;
+        //progressBar.maxValue = GeneratedQuestions.Count;
 
         GetNextQuestion();
 
@@ -124,6 +127,24 @@ public class quiz : MonoBehaviour
             timerImage.sprite = solutionTimerSprite;
         
         timerImage.fillAmount = timer.fillAmount;
+
+        // solution Å¸ï¿½Ó¿ï¿½ï¿½ï¿½ TimePlus, HintPopup ï¿½ï¿½È°ï¿½ï¿½È­
+        if (!timer.isProblemTime)
+        {
+            if (TimePlus != null)
+                TimePlus.interactable = false;
+            if (HintPopup != null)
+                HintPopup.SetActive(false);
+        }
+
+        // ï¿½ï¿½ï¿½ï¿½ï¿½Ì´ï¿½ï¿½ï¿½ 9ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ WinCanvas È°ï¿½ï¿½È­
+        if (WinCanvas != null && progressBar.value >= 9)
+        {
+            WinCanvas.SetActive(true);
+            QuizCanvas.SetActive(false);
+            // ì—”ë“œì”¬ìœ¼ë¡œ ì „í™˜
+            GameManager.Instance.ShowEndScene();
+        }
 
         if (timer.loadNextQuestion)
         {
@@ -149,7 +170,7 @@ public class quiz : MonoBehaviour
     {
         if(questions.Count <= 0)
         {
-            Debug.Log("³²Àº¹®Á¦¾øÀ½");
+            Debug.Log("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
             return;
         }
 
@@ -164,9 +185,13 @@ public class quiz : MonoBehaviour
         scoreKeeper.IncrementQuestionSeen();
         progressBar.value++;
 
-        // ¹®Á¦ ½ÃÀÛ ½Ã HintPopup È°¼ºÈ­
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ HintPopup È°ï¿½ï¿½È­
         if (HintPopup != null)
             HintPopup.SetActive(true);
+
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ TimePlus ï¿½ï¿½Æ° È°ï¿½ï¿½È­
+        if (TimePlus != null)
+            TimePlus.interactable = true;
     }
 
     private void GetRandomQuestion()
@@ -193,23 +218,18 @@ public class quiz : MonoBehaviour
         chooseAnswer = true;
         Displaysolution(index);
         timer.CancelTimer();
-        scoreText.text = $"Á¡¼ö : {scoreKeeper.CalculateScore()}Á¡";
-
-        //if (progressBar.value == progressBar.maxValue)
-        //{
-        //    isComplete = true;
-        //}
+        scoreText.text = $"ï¿½ï¿½ï¿½ï¿½ : {scoreKeeper.CalculateScore()}ï¿½ï¿½";
     }
 
     private void Displaysolution(int index)
     {
         if (index == currentQuestion.GetCorrectAnswerIndex())
         {
-            questionText.text = "Á¤´äÀÔ´Ï´Ù!";
+            questionText.text = "ï¿½ï¿½ï¿½ï¿½ï¿½Ô´Ï´ï¿½!";
             answerButtons[index].GetComponent<Image>().sprite = correctAnswerSprite;
             scoreKeeper.IncrementCorrectAnswer();
 
-            // ³²Àº ½Ã°£¿¡ µû¶ó Á¡¼ö Â÷µî ºÎ¿©
+            // ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Î¿ï¿½
             int bonusScore = 1;
             if (timer.isProblemTime && timer != null)
             {
@@ -224,13 +244,13 @@ public class quiz : MonoBehaviour
                     bonusScore = 1;
             }
 
-            scoreKeeper.AddScore(bonusScore); // ½ÇÁ¦ Á¡¼ö¿¡ º¸³Ê½º ¹Ý¿µ
-            scoreText.text = $"Á¡¼ö : {scoreKeeper.CalculateScore()}Á¡";
+            scoreKeeper.AddScore(bonusScore); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ê½ï¿½ ï¿½Ý¿ï¿½
+            scoreText.text = $"ï¿½ï¿½ï¿½ï¿½ : {scoreKeeper.CalculateScore()}ï¿½ï¿½";
         }
         else
         {
-            questionText.text = "Æ²·È½À´Ï´Ù " + currentQuestion.GetcorrectAnswer() + "ÀÌ Á¤´äÀÔ´Ï´Ù.";
-            scoreText.text = $"Á¡¼ö : {scoreKeeper.CalculateScore()}Á¡";
+            questionText.text = "Æ²ï¿½È½ï¿½ï¿½Ï´ï¿½ " + currentQuestion.GetcorrectAnswer() + "ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ô´Ï´ï¿½.";
+            scoreText.text = $"ï¿½ï¿½ï¿½ï¿½ : {scoreKeeper.CalculateScore()}ï¿½ï¿½";
         }
 
         SetButtonState(false);
@@ -257,5 +277,30 @@ public class quiz : MonoBehaviour
     {
         if (HintPopup != null)
             HintPopup.SetActive(false);
+    }
+
+    public void TimePlusClicked()
+    {
+        // Å¸ï¿½Ì¸Ó¿ï¿½ 30ï¿½ï¿½ ï¿½ß°ï¿½
+        if (timer != null)
+        {
+            var timeField = typeof(Timer).GetField("time", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (timeField != null)
+            {
+                float currentTime = (float)timeField.GetValue(timer);
+                timeField.SetValue(timer, currentTime + 20f);
+            }
+        }
+
+        // ï¿½ï¿½ï¿½ï¿½ 2ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        if (scoreKeeper != null)
+        {
+            scoreKeeper.AddScore(-2);
+            scoreText.text = $"ï¿½ï¿½ï¿½ï¿½ : {scoreKeeper.CalculateScore()}ï¿½ï¿½";
+        }
+
+        // ï¿½ï¿½Æ° ï¿½ï¿½È°ï¿½ï¿½È­
+        if (TimePlus != null)
+            TimePlus.interactable = false;
     }
 }

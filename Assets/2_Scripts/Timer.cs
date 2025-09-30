@@ -82,14 +82,19 @@ public class Timer : MonoBehaviour
     {
         if (timerImage != null && timerText != null)
         {
-            if (isProblemTime && time <= 9f)
+            if (isProblemTime && time > 20f)
+            {
+                timerImage.color = Color.green;
+                timerText.color = Color.white;
+            }
+            else if (isProblemTime && time < 10f)
             {
                 timerImage.color = Color.red;
                 timerText.color = Color.yellow;
             }
             else
             {
-                timerImage.color = defaultColor;
+                timerImage.color = Color.white;
                 timerText.color = Color.white;
             }
         }

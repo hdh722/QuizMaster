@@ -45,7 +45,7 @@ public class QuizQuestion
     public string question;
     public string[] answers;
     public int correctAnswerIndex;
-    public string hint; // ÈùÆ® ÇÊµå Ãß°¡
+    public string hint; // íŒíŠ¸ í•„ë“œ ì¶”ê°€
 }
 
 public class ChatGPTClient : MonoBehaviour
@@ -80,38 +80,38 @@ public class ChatGPTClient : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.LogWarning($"Resources ¼³Á¤ ÆÄÀÏ ·Îµå ½ÇÆĞ: {e.Message}");
+            Debug.LogWarning($"Resources íŒŒì¼ ë¡œë“œ ì‹¤íŒ¨: {e.Message}");
         }
 
         return "";
     }
 
-    public void GenerateQuizQuestions(int count = 5, string topic = "ÀÏ¹İ»ó½Ä")
+    public void GenerateQuizQuestions(int count = 3, string topic = "ì¼ë°˜ìƒì‹")
     {
         StartCoroutine(RequestQuizQuestions(count, topic));
     }
 
     private IEnumerator RequestQuizQuestions(int count, string topic)
     {
-        string prompt = $"´ÙÀ½ Á¶°Ç¿¡ ¸Â´Â Ã¢ÀÇÀûÀÌ°í Àç¹ÌÀÖ´Â °´°ü½Ä ÄûÁî ¹®Á¦¸¦ {count}°³ »ı¼ºÇØÁÖ¼¼¿ä:\n" +
-                       $"ÁÖÁ¦: {topic}\n" +
-                       "Á¶°Ç:\n" +
-                       "- ¹®ÀåÀÌ ³Ê¹« ±æ¾îÁöÁö ¾Êµµ·Ï ´Ùµë¾îÁÖ¼¼¿ä" +
-                       "- °¢ ¹®Á¦´Â 4°³ÀÇ µ¶Ã¢ÀûÀÌ°í Âü½ÅÇÑ ¼±ÅÃÁö¸¦ °¡Á®¾ß ÇÕ´Ï´Ù\n" +
-                       "- ¹®Á¦´Â ´Ù¾çÇÑ ³­ÀÌµµ¿Í À¯ÇüÀ¸·Î ±¸¼ºÇØÁÖ¼¼¿ä (±âÃÊÁö½Ä, Ãß·Ğ¹®Á¦, »ó½ÄÄûÁî, Ã¢ÀÇÀû »ç°í µî)\n" +
-                       "- ¹®Á¦ ÅØ½ºÆ®ÀÇ Å¸ÀÔÀº (ÁÖÁ¦)(¹®Á¦ ³»¿ë)À¸·Î ÀÛ¼ºÇØÁÖ¼¼¿ä\n" +
-                       "- ¼±ÅÃÁö´Â ÇÔÁ¤ÀÌ ÀÖ°Å³ª ÀçÄ¡ÀÖ°Ô ±¸¼ºÇØÁÖ¼¼¿ä\n" +
-                       "- Á¤´äÀº 0~3 »çÀÌÀÇ ÀÎµ¦½º·Î Ç¥½ÃÇØÁÖ¼¼¿ä\n" +
-                       "- ¹®Á¦¿Í ¼±ÅÃÁö´Â Èï¹Ì·Ó°í Âü¿©ÇÏ°í ½Í°Ô ¸¸µé¾îÁÖ¼¼¿ä\n" +
-                       "- °¢ ¹®Á¦¿¡ ´ëÇÑ ÈùÆ®µµ ÀÛ¼ºÇØÁÖ¼¼¿ä\n" +
-                       "- °¡´ÉÇÏ¸é ½Ç»ıÈ°°ú ¿¬°üµÈ ¿¹½Ã³ª ½Ã³ª¸®¿À¸¦ È°¿ëÇØÁÖ¼¼¿ä\n" +
-                       "- ÀÀ´äÀº ¹İµå½Ã ´ÙÀ½ JSON Çü½ÄÀ¸·Î¸¸ Á¦°øÇØÁÖ¼¼¿ä:\n" +
+        string prompt = $"í€´ì¦ˆ ê²Œì„ì— ì í•©í•œ ì¬ë¯¸ìˆê³  ë„ì „ì ì¸ ë¬¸ì œë¥¼ {count}ê°œ ë§Œë“¤ì–´ì£¼ì„¸ìš”:\n" +
+                       $"ì£¼ì œ: {topic}\n" +
+                       "ìš”êµ¬ì‚¬í•­:\n" +
+                       "- ë¬¸ì œëŠ” ë„ˆë¬´ ì–´ë µì§€ë„ ì‰½ì§€ë„ ì•Šì€ ì ë‹¹í•œ ë‚œì´ë„ë¡œ ë§Œë“¤ì–´ì£¼ì„¸ìš”" +
+                       "- ê° ë¬¸ì œëŠ” 4ê°œì˜ ê°ê´€ì‹ì´ê³  ì •ë‹µì€ 1ê°œë§Œ ìˆìŠµë‹ˆë‹¤\n" +
+                       "- ë¬¸ì œëŠ” í¥ë¯¸ë¡­ê³  ì¬ë¯¸ìˆëŠ” ì£¼ì œë¡œ ë§Œë“¤ì–´ì£¼ì„¸ìš” (ê³¼í•™, ì—­ì‚¬, ì§€ë¦¬, ë¬¸í™”, ì˜ˆìˆ  ë“±)\n" +
+                       "- ë‹µë³€ í…ìŠ¤íŠ¸ëŠ” ì§§ê³  ëª…í™•í•˜ê²Œ (í•œë‘ ë‹¨ì–´)(ê¸´ ì„¤ëª… ì—†ì´)ì‘ì„±í•´ì£¼ì„¸ìš”\n" +
+                       "- ë¬¸ì œëŠ” êµìœ¡ì ì´ê±°ë‚˜ ìœ ìµí•˜ê±°ë‚˜ ì¬ë¯¸ìˆëŠ” ë‚´ìš©ìœ¼ë¡œ ë§Œë“¤ì–´ì£¼ì„¸ìš”\n" +
+                       "- ì •ë‹µì€ 0~3 ì‚¬ì´ì˜ ì¸ë±ìŠ¤ë¡œ í‘œì‹œí•´ì£¼ì„¸ìš”\n" +
+                       "- ë¬¸ì œëŠ” í•œêµ­ì–´ë¡œ ì‘ì„±í•˜ê³  ë‹µë³€ë„ í•œêµ­ì–´ë¡œ ì‘ì„±í•´ì£¼ì„¸ìš”\n" +
+                       "- ê° ë¬¸ì œì— ëŒ€í•œ íŒíŠ¸ë¥¼ ì‘ì„±í•´ì£¼ì„¸ìš”\n" +
+                       "- ë‹µë³€ì€ ì •í™•í•˜ê³  ê°ê´€ì ì´ë©° ê²€ì¦ ê°€ëŠ¥í•œ ì •ë³´ë¡œ ì‘ì„±í•´ì£¼ì„¸ìš”\n" +
+                       "- ë°˜ë“œì‹œ ë‹¤ìŒ JSON í˜•ì‹ìœ¼ë¡œë§Œ ì‘ë‹µí•´ì£¼ì„¸ìš”:\n" +
                        "{\n" +
                        "  \"questions\": [\n" +
                        "    {\n" +
-                       "      \"question\": \"¹®Á¦ ³»¿ë\",\n" +
-                       "      \"answers\": [\"¼±ÅÃÁö1\", \"¼±ÅÃÁö2\", \"¼±ÅÃÁö3\", \"¼±ÅÃÁö4\"],\n" +
-                       "      \"hint\": \"¹®Á¦ ÈùÆ®\",\n" +
+                       "      \"question\": \"ë¬¸ì œ ë‚´ìš©\",\n" +
+                       "      \"answers\": [\"ë‹µë³€1\", \"ë‹µë³€2\", \"ë‹µë³€3\", \"ë‹µë³€4\"],\n" +
+                       "      \"hint\": \"ë¬¸ì œ íŒíŠ¸\",\n" +
                        "      \"correctAnswerIndex\": 0\n" +
                        "    }\n" +
                        "  ]\n" +
@@ -169,7 +169,7 @@ public class ChatGPTClient : MonoBehaviour
                     }
 
                     Debug.Log("Response from ChatGPT:\n" + jsonContent);
-                    // JSON ¹®ÀÚ¿­¿¡¼­ ºÒÇÊ¿äÇÑ ºÎºĞ Á¦°Å
+                    // JSON ë¬¸ìì—´ì—ì„œ ë§ˆí¬ë‹¤ìš´ ë¶€ë¶„ ì œê±°
                     jsonContent = jsonContent.Trim();
                     if (jsonContent.StartsWith("```json"))
                     {
@@ -188,15 +188,15 @@ public class ChatGPTClient : MonoBehaviour
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"ÀÀ´ä ÆÄ½Ì ¿À·ù: {e.Message}");
-                    Debug.LogError($"ÀÀ´ä ³»¿ë: {webRequest.downloadHandler.text}");
+                    Debug.LogError($"JSON íŒŒì‹± ì˜¤ë¥˜: {e.Message}");
+                    Debug.LogError($"ì‘ë‹µ ë‚´ìš©: {webRequest.downloadHandler.text}");
                 }
             }
             else
             {
-                Debug.LogError($"ChatGPT API ¿äÃ» ½ÇÆĞ: {webRequest.error}");
-                Debug.LogError($"ÀÀ´ä ÄÚµå: {webRequest.responseCode}");
-                Debug.LogError($"ÀÀ´ä ³»¿ë: {webRequest.downloadHandler.text}");
+                Debug.LogError($"ChatGPT API ìš”ì²­ ì‹¤íŒ¨: {webRequest.error}");
+                Debug.LogError($"ì‘ë‹µ ì½”ë“œ: {webRequest.responseCode}");
+                Debug.LogError($"ì‘ë‹µ ë‚´ìš©: {webRequest.downloadHandler.text}");
             }
         }
     }
@@ -209,7 +209,7 @@ public class ChatGPTClient : MonoBehaviour
         {
             QuestionSO questionSO = ScriptableObject.CreateInstance<QuestionSO>();
 
-            // ReflectionÀ» »ç¿ëÇÏ¿© private ÇÊµå¿¡ °ª ¼³Á¤
+            // Reflectionì„ ì‚¬ìš©í•´ì„œ private í•„ë“œì— ê°’ ì„¤ì •
             var questionField = typeof(QuestionSO).GetField("question", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             var answersField = typeof(QuestionSO).GetField("answers", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             var correctAnswerIndexField = typeof(QuestionSO).GetField("correctAnswerIndex", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
@@ -218,7 +218,7 @@ public class ChatGPTClient : MonoBehaviour
             questionField?.SetValue(questionSO, quizQ.question);
             answersField?.SetValue(questionSO, quizQ.answers);
             correctAnswerIndexField?.SetValue(questionSO, quizQ.correctAnswerIndex);
-            hintField?.SetValue(questionSO, quizQ.hint); // ÈùÆ® ¿¬°á
+            hintField?.SetValue(questionSO, quizQ.hint); // íŒíŠ¸ ì„¤ì •
 
             questionSOs.Add(questionSO);
         }
