@@ -7,27 +7,27 @@ using UnityEngine.UI;
 
 public class quiz : MonoBehaviour
 {
-    [Header("����")]
+    [Header("질문")]
     [SerializeField] TextMeshProUGUI questionText;
     [SerializeField] TextMeshProUGUI hintText;
     [SerializeField] List<QuestionSO> questions = new List<QuestionSO>();
     QuestionSO currentQuestion;
 
-    [Header("����")]
+    [Header("보기")]
     [SerializeField] GameObject[] answerButtons;
     
-    [Header("��ư ��")]
+    [Header("버튼 색")]
     [SerializeField] Sprite defaultAnswerSprite;
     [SerializeField] Sprite correctAnswerSprite;
 
-    [Header("Ÿ�̸�")]
+    [Header("타이머")]
     [SerializeField] Image timerImage;
     [SerializeField] Sprite problemTimerSprite;
     [SerializeField] Sprite solutionTimerSprite;
     Timer timer;
     bool chooseAnswer = false;
 
-    [Header("����")]
+    [Header("점수")]
     [SerializeField] TextMeshProUGUI scoreText;
     ScoreKeeper scoreKeeper;
 
@@ -41,9 +41,9 @@ public class quiz : MonoBehaviour
     [SerializeField] TextMeshProUGUI LoadingText;
     [SerializeField] TextMeshProUGUI HintText;
 
-    [SerializeField] GameObject HintPopup; // �ν����Ϳ��� �巡��
-    [SerializeField] Button TimePlus;      // �ν����Ϳ��� �巡��
-    [SerializeField] GameObject WinCanvas; // �ν����Ϳ��� �巡��
+    [SerializeField] GameObject HintPopup; 
+    [SerializeField] Button TimePlus;      
+    [SerializeField] GameObject WinCanvas; 
     [SerializeField] GameObject QuizCanvas;
 
     bool isGeneratingQuestions = false;
@@ -87,7 +87,7 @@ public class quiz : MonoBehaviour
 
     private string GetTrandTopic()
     {
-        string[] topics = new string[] { "����", "����", "������", "����", "��ȭ" };
+        string[] topics = new string[] { "예술", "음악", "스포츠", "동물", "문화" };
         int randomIndex = UnityEngine.Random. Range(0, topics.Length);
         return topics[randomIndex];
     }
@@ -99,12 +99,12 @@ public class quiz : MonoBehaviour
 
         if(GeneratedQuestions == null || GeneratedQuestions.Count ==0)
         {
-            Debug.LogError("������������");
-            LoadingText.text = "���� ������ �����߽��ϴ�.";
+            Debug.LogError("질문생성실패");
+            LoadingText.text = "문제 생성에 실패했습니다.";
             return;
         }
 
-        Debug.Log("���������Ϸ� ===> " + GeneratedQuestions[0].GetQuestion());
+        Debug.Log("질문생성완료 ===> " + GeneratedQuestions[0].GetQuestion());
         questions.AddRange(GeneratedQuestions);
         //progressBar.maxValue = GeneratedQuestions.Count;
 
@@ -128,7 +128,7 @@ public class quiz : MonoBehaviour
         
         timerImage.fillAmount = timer.fillAmount;
 
-        // solution Ÿ�ӿ��� TimePlus, HintPopup ��Ȱ��ȭ
+        // solution 타임에서 TimePlus, HintPopup 비활성화
         if (!timer.isProblemTime)
         {
             if (TimePlus != null)
@@ -137,13 +137,16 @@ public class quiz : MonoBehaviour
                 HintPopup.SetActive(false);
         }
 
-        // �����̴��� 9�� �����ϸ� WinCanvas Ȱ��ȭ
-        if (WinCanvas != null && progressBar.value >= 9)
+        // 슬라이더가 최대값에 도달하면 WinCanvas 활성화 및 엔드씬 전환
+        if (progressBar != null && progressBar.value >= progressBar.maxValue)
         {
-            WinCanvas.SetActive(true);
-            QuizCanvas.SetActive(false);
-            // 엔드씬으로 전환
-            GameManager.Instance.ShowEndScene();
+            if (WinCanvas != null)
+                WinCanvas.SetActive(true);
+            if (QuizCanvas != null)
+                QuizCanvas.SetActive(false);
+
+            if (GameManager.Instance != null)
+                GameManager.Instance.ShowEndScene();
         }
 
         if (timer.loadNextQuestion)
@@ -170,7 +173,7 @@ public class quiz : MonoBehaviour
     {
         if(questions.Count <= 0)
         {
-            Debug.Log("������������");
+            Debug.Log("남은 문제 없음");
             return;
         }
 
@@ -185,11 +188,9 @@ public class quiz : MonoBehaviour
         scoreKeeper.IncrementQuestionSeen();
         progressBar.value++;
 
-        // ���� ���� �� HintPopup Ȱ��ȭ
         if (HintPopup != null)
             HintPopup.SetActive(true);
 
-        // ���� ���� �� TimePlus ��ư Ȱ��ȭ
         if (TimePlus != null)
             TimePlus.interactable = true;
     }
@@ -218,14 +219,14 @@ public class quiz : MonoBehaviour
         chooseAnswer = true;
         Displaysolution(index);
         timer.CancelTimer();
-        scoreText.text = $"���� : {scoreKeeper.CalculateScore()}��";
+        scoreText.text = $"점수 : {scoreKeeper.CalculateScore()}점";
     }
 
     private void Displaysolution(int index)
     {
         if (index == currentQuestion.GetCorrectAnswerIndex())
         {
-            questionText.text = "�����Դϴ�!";
+            questionText.text = "정답입니다!";
             answerButtons[index].GetComponent<Image>().sprite = correctAnswerSprite;
             scoreKeeper.IncrementCorrectAnswer();
 
@@ -245,12 +246,12 @@ public class quiz : MonoBehaviour
             }
 
             scoreKeeper.AddScore(bonusScore); // ���� ������ ���ʽ� �ݿ�
-            scoreText.text = $"���� : {scoreKeeper.CalculateScore()}��";
+            scoreText.text = $"점수 : {scoreKeeper.CalculateScore()}점";
         }
         else
         {
-            questionText.text = "Ʋ�Ƚ��ϴ� " + currentQuestion.GetcorrectAnswer() + "�� �����Դϴ�.";
-            scoreText.text = $"���� : {scoreKeeper.CalculateScore()}��";
+            questionText.text = "틀렸습니다 " + currentQuestion.GetcorrectAnswer() + "이가 정답입니다..";
+            scoreText.text = $"점수 : {scoreKeeper.CalculateScore()}점";
         }
 
         SetButtonState(false);
@@ -281,7 +282,7 @@ public class quiz : MonoBehaviour
 
     public void TimePlusClicked()
     {
-        // Ÿ�̸ӿ� 30�� �߰�
+        // 타이머에 30초 추가
         if (timer != null)
         {
             var timeField = typeof(Timer).GetField("time", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
@@ -292,14 +293,14 @@ public class quiz : MonoBehaviour
             }
         }
 
-        // ���� 2�� ����
+        // 점수 2점 차감
         if (scoreKeeper != null)
         {
             scoreKeeper.AddScore(-2);
-            scoreText.text = $"���� : {scoreKeeper.CalculateScore()}��";
+            scoreText.text = $"점수 : {scoreKeeper.CalculateScore()}점";
         }
 
-        // ��ư ��Ȱ��ȭ
+        // 버튼 비활성화
         if (TimePlus != null)
             TimePlus.interactable = false;
     }
