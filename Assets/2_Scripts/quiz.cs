@@ -37,7 +37,7 @@ public class quiz : MonoBehaviour
 
     [Header("ChatGPT clietnt")]
     [SerializeField] ChatGPTClient chatGPTClient;
-    [SerializeField] int questionCount = 9;
+    [SerializeField] int questionCount = 10;
     [SerializeField] TextMeshProUGUI LoadingText;
     [SerializeField] TextMeshProUGUI HintText;
 
