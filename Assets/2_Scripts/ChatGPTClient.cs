@@ -5,7 +5,6 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
-[Serializable]
 public class ChatGPTRequest
 {
     public string model = "gpt-4.1-nano";
@@ -80,12 +79,11 @@ public class ChatGPTClient : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.LogWarning($"Resources 파일 로드 실패: {e.Message}");
+            Debug.LogWarning($"Resources 설정 파일 로드 실패: {e.Message}");
         }
 
         return "";
     }
-
     public void GenerateQuizQuestions(int count = 3, string topic = "일반상식")
     {
         StartCoroutine(RequestQuizQuestions(count, topic));
